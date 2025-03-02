@@ -19,8 +19,8 @@ class StatsTester:
         """Receives a name of a player and their collection of results and sends a request for the winning percentage of that player."""
         request = {"type": "win-percent", "results": results}
         self.socket.send_json(request)
-        response = self.socket.recv().decode()
-        print(response)
+        response = self.socket.recv_json()
+        print(response["win-percent"])
 
     def request_leaderboard(self, results):
         """Receives a collection of results and sends a request for a leaderboard."""

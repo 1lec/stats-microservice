@@ -17,6 +17,12 @@ class DataAnalyzer:
         socket.bind(f"tcp://*:{port}")
         return socket
     
+    def calculate_winning_percentage(self, dataframe):
+        """Receives a DataFrame of game results for a player, and, using the Results column, calculates the winning percentage of that player."""
+        decimal_value = dataframe.describe().loc[["mean"]].values[0][0]  # from 0 to 1 with variable decimal places
+        win_percent = round(decimal_value * 100, 2)  # from 0.00 to 100.00 with up to 2 decimal places
+        self.socket.send_json({"win-percent": win_percent})
+    
     def listen(self):
         """Listens for client requests."""
         while True:
@@ -24,7 +30,8 @@ class DataAnalyzer:
             request_type = request["type"]
 
             if request_type == "win-percent":
-                self.socket.send_string("Received request for a win percentage.")
+                df = pd.DataFrame(request["results"], columns = ["Name", "Results"])
+                self.calculate_winning_percentage(df)
             if request_type == "leaderboard":
                 self.socket.send_string("Received request for a leaderboard")
 
