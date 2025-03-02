@@ -11,15 +11,22 @@ class DataAnalyzer:
         self.socket = self.zmq_connect(ZMQ_PORT)
 
     def zmq_connect(self, port):
+        """Receives a port and establishes a ZeroMQ connection via that port."""
         context = zmq.Context()
         socket = context.socket(zmq.REP)
         socket.bind(f"tcp://*:{port}")
         return socket
     
     def listen(self):
-        request = self.socket.recv_string()
-        print(request)
-        self.socket.send_string("Request received!")
+        """Listens for client requests."""
+        while True:
+            request = self.socket.recv_json()
+            request_type = request["type"]
+
+            if request_type == "win-percent":
+                self.socket.send_string("Received request for a win percentage.")
+            if request_type == "leaderboard":
+                self.socket.send_string("Received request for a leaderboard")
 
 def main():
     da = DataAnalyzer()
