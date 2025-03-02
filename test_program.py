@@ -15,9 +15,9 @@ class StatsTester:
         socket.connect(f"tcp://localhost:{port}")
         return socket
     
-    def request_winning_percentage(self, name, results):
+    def request_winning_percentage(self, results):
         """Receives a name of a player and their collection of results and sends a request for the winning percentage of that player."""
-        request = {"type": "win-percent", "name": name, "results": results}
+        request = {"type": "win-percent", "results": results}
         self.socket.send_json(request)
         response = self.socket.recv().decode()
         print(response)
