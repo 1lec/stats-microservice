@@ -26,7 +26,9 @@ class DataAnalyzer:
     def create_leaderboard(self, dataframe):
         """Receives a Dataframe of game results for all players, and returns a list of the top 10 names by winning percentage in
         descending order."""
-        pass
+        series = dataframe.groupby("Name")[["Results"]].mean()
+        self.socket.send_string("Created leaderboard.")
+        print(series)
     
     def listen(self):
         """Listens for client requests."""
