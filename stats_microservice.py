@@ -10,6 +10,7 @@ def decimal_to_percent(decimal):
     return round(decimal * 100, 2)
 
 class DataAnalyzer:
+    """Receives requests via ZMQ and performs data manipulations based on the request."""
     def __init__(self):
         self.socket = self.zmq_connect(ZMQ_PORT)
 
@@ -21,13 +22,14 @@ class DataAnalyzer:
         return socket
     
     def calculate_winning_percentage(self, dataframe):
-        """Receives a DataFrame of game results for a player, and, using the Results column, calculates the winning percentage of that player."""
+        """Receives a DataFrame of game results for a player, and, using the Results column, calculates the winning percentage of
+        that player."""
         decimal_value = dataframe["Results"].mean()      # from 0 to 1 with variable decimal places
         win_percent = decimal_to_percent(decimal_value)  # from 0.00 to 100.00 with up to 2 decimal places
         self.socket.send_json({"win-percent": win_percent})
 
     def create_leaderboard(self, dataframe):
-        """Receives a Dataframe of game results for all players and sends a list of lists of name and winning percentage
+        """Receives a Dataframe of game results for all players and creates a list of lists of name and winning percentage
         sorted by winning percentage."""
         # Groups all results by Name, calculates the winning percentage for each, and takes the top 10 in descending order
         decimals = dataframe.groupby("Name")[["Results"]].mean()
