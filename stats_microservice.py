@@ -35,13 +35,23 @@ class DataAnalyzer:
         decimals = dataframe.groupby("Name")[["Results"]].mean()
         sorted_decimals = decimals.sort_values(by="Results", ascending=False)
         sorted_top_10_percents = sorted_decimals[["Results"]].apply(decimal_to_percent).head(10)
+        completed_dataframe = self.reassign_indices(sorted_top_10_percents)
 
-        # Creates a JSON-safe list of lists from the above dataframe
-        top_10_json = []
-        for name, percent in sorted_top_10_percents.iterrows():
-            top_10_json.append([name, percent["Results"]])
+        top_10_json = completed_dataframe.to_json()
+        self.socket.send_json(top_10_json)
 
-        self.socket.send_json({"leaderboard": top_10_json})
+    def reassign_indices(self, df):
+        """Receives a DataFrame with Names as indices and a single column of winning percentages and
+        returns a new DataFrame with places (1st, 2nd, 3rd, etc.) as indices and Name and Winning
+        Percentage as columns."""
+        df = df.rename(columns={"Results": "Winning Percentage"})
+        df = df.reset_index()
+        places = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th']
+        row_count = len(df)
+        df.index = places[:row_count]
+
+        return df
+
     
     def listen(self):
         """Listens for client requests."""
