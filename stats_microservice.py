@@ -19,6 +19,7 @@ class DataAnalyzer:
         context = zmq.Context()
         socket = context.socket(zmq.REP)
         socket.bind(f"tcp://*:{port}")
+        print(f"Stats Microservice is running and is listening on port {port}...")
         return socket
     
     def calculate_winning_percentage(self, dataframe):
@@ -57,6 +58,7 @@ class DataAnalyzer:
         """Listens for client requests."""
         while True:
             request = self.socket.recv_json()
+            print("Request received:", request)
             request_type = request["type"]
 
             if request_type == "win-percent":
